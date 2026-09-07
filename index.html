@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en" id="top">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bernard Dohrn</title>
+<meta name="description" content="Neural engineering at the University of Illinois. Work on EMG and EEG decoding, analog front-end design, and hands-free interaction.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<main id="main">
+
+  <section class="intro" id="top">
+    <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+
+    <div class="intro__identity">
+      <h1 class="intro__name">Bernard Dohrn</h1>
+      <p class="intro__disciplines">Neural engineering<span aria-hidden="true"> · </span>Brain-computer interfaces<span aria-hidden="true"> · </span>Machine learning<span aria-hidden="true"> · </span>Computer science</p>
+
+      <nav class="hero-nav" aria-label="Sections">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+
+    <p class="intro__lede">I'm a neural engineering student at the University of Illinois, part of the program's
+      inaugural class and graduating in 2027, with a minor in computer science. My work spans
+      the process of turning biological signals into useful information, from building the
+      systems that record them to developing the software and machine learning models that
+      interpret them.</p>
+    <p class="intro__lede">My work has focused on brain-computer interfaces and neurotechnology, including decoding
+      brain and muscle signals, predicting brain activity from electrical recordings, and
+      building real-time systems that let people interact with computers without using their
+      hands. Most of my work is in software, but I enjoy working across the whole process of
+      turning a biological signal into something a computer can understand and act on.</p>
+  </section>
+
+  <section id="work" class="work" aria-labelledby="work-heading">
+    <h2 id="work-heading" class="section-heading">Work</h2>
+
+    <article class="entry entry--active">
+      <div class="entry__rail">
+        <p class="entry__dates">Apr 2026 - present</p>
+        <p class="entry__context">ISUR Program</p>
+        <p class="entry__status"><span class="entry__status-mark" aria-hidden="true"></span>Active</p>
+      </div>
+      <div class="entry__body">
+        <h3 class="entry__title"><a href="emg-hand-pose.html">EMG Hand Pose Estimation</a></h3>
+        <p>A device that reads hand pose from forearm EMG. A webcam running hand tracking labels the EMG
+          as it records, so the training data needs no manual annotation. I am designing the
+          analog front end myself.</p>
+        <p class="entry__stack">Python<span aria-hidden="true"> · </span>MediaPipe<span aria-hidden="true"> · </span>Arduino<span aria-hidden="true"> · </span>Signal processing<span aria-hidden="true"> · </span>Analog circuit design</p>
+        <p class="entry__links"><a href="emg-hand-pose.html">Full write-up</a></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry__rail">
+        <p class="entry__dates">Jan - May 2026</p>
+        <p class="entry__context">NE 422, Neural Imaging</p>
+      </div>
+      <div class="entry__body">
+        <h3 class="entry__title"><a href="eeg-fmri-reconstruction.html">Cross-Modal Brain Signal Reconstruction</a></h3>
+        <p>EEG has millisecond timing but only a coarse, ill-posed account of where activity comes from.
+          Three architectures for predicting fMRI activation maps from EEG alone, including a
+          transformer with cross-modal attention.</p>
+        <p class="entry__stack">PyTorch<span aria-hidden="true"> · </span>MNE-Python<span aria-hidden="true"> · </span>Nilearn<span aria-hidden="true"> · </span>EEGNet<span aria-hidden="true"> · </span>U-Net<span aria-hidden="true"> · </span>Transformers</p>
+        <p class="entry__links"><a href="eeg-fmri-reconstruction.html">Full write-up</a></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry__rail">
+        <p class="entry__dates">Jan - May 2026</p>
+        <p class="entry__context">NE 412, Neural Signal Analysis</p>
+      </div>
+      <div class="entry__body">
+        <h3 class="entry__title"><a href="motor-impairment-decoding.html">EEG-Based Motor Impairment Decoding</a></h3>
+        <p>Stroke recovery is scored by hand, by a clinician, on a subjective scale. This project tested
+          how far EEG from sensorimotor cortex gets toward doing that objectively.</p>
+        <p class="entry__stack">scikit-learn<span aria-hidden="true"> · </span>MNE-Python<span aria-hidden="true"> · </span>Logistic regression<span aria-hidden="true"> · </span>Random forest<span aria-hidden="true"> · </span>Feature engineering</p>
+        <p class="entry__links"><a href="motor-impairment-decoding.html">Full write-up</a></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry__rail">
+        <p class="entry__dates">Nov 2025</p>
+        <p class="entry__context">Neurohack</p>
+        <p class="entry__note">Second place</p>
+      </div>
+      <div class="entry__body">
+        <h3 class="entry__title"><a href="openinteraction.html">OpenInteraction</a></h3>
+        <p>A way to drive a desktop computer with no hands, using eye tracking, head pose, and blink
+          detection off a single webcam. It is open source, which the commercial alternatives
+          are not.</p>
+        <p class="entry__stack">Python<span aria-hidden="true"> · </span>OpenCV<span aria-hidden="true"> · </span>MediaPipe<span aria-hidden="true"> · </span>EyeTrax<span aria-hidden="true"> · </span>PyQt5<span aria-hidden="true"> · </span>Tkinter</p>
+        <p class="entry__links"><a href="openinteraction.html">Full write-up</a></p>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry__rail">
+        <p class="entry__dates">Aug 2024 - May 2025</p>
+        <p class="entry__context">Neurotech Club</p>
+      </div>
+      <div class="entry__body">
+        <h3 class="entry__title"><a href="neurotech-interface-software.html">EEG and EMG Neural Interface Software</a></h3>
+        <p>A year on the software side of the club, writing preprocessing and neural decoding pipelines
+          for a full-body neural-controlled prosthetic.</p>
+        <p class="entry__stack">PyTorch<span aria-hidden="true"> · </span>Signal preprocessing<span aria-hidden="true"> · </span>Neural decoding</p>
+        <p class="entry__links"><a href="neurotech-interface-software.html">Full write-up</a></p>
+      </div>
+    </article>
+  </section>
+
+  <section id="about" class="about" aria-labelledby="about-heading">
+    <h2 id="about-heading" class="section-heading">About</h2>
+
+    <div class="about__grid">
+      <div class="about__row">
+        <h3 class="about__label">Education</h3>
+        <div class="about__content">
+          <p class="about__lead">BS Neural Engineering, University of Illinois at Urbana-Champaign, inaugural class, graduating
+            May 2027. Minor in Computer Science. GPA 4.0.</p>
+          <p class="about__aside">Chancellor's Scholar. Dean's List.</p>
+        </div>
+      </div>
+
+      <div class="about__row">
+        <h3 class="about__label">Coursework</h3>
+        <div class="about__content">
+          <ul class="about__list">
+            <li><span class="code">NE 431</span> Neural Tissue Engineering and Lab</li>
+            <li><span class="code">NE 422</span> Neural Imaging</li>
+            <li><span class="code">NE 420</span> Neural Interface Engineering <span class="about__when">Spring 2027</span></li>
+            <li><span class="code">NE 412</span> Neural Signal Analysis</li>
+            <li><span class="code">NE 410</span> Neural Circuits and Systems</li>
+            <li><span class="code">NE 330</span> Neuroscience for Engineers</li>
+            <li><span class="code">CS 441</span> Applied Machine Learning</li>
+            <li><span class="code">CS 418</span> Interactive Computer Graphics</li>
+            <li><span class="code">CS 225</span> Data Structures and Algorithms</li>
+            <li><span class="code">BIOE 430</span> Synthetic Biology</li>
+            <li><span class="code">BIOE 205</span> Signals and Systems in Bioengineering</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="about__row">
+        <h3 class="about__label">Code</h3>
+        <div class="about__content">
+          <p>MATLAB, C++, Python, Kotlin.</p>
+          <p class="about__aside">Git, NumPy, PyTorch, OpenCV, Linux.</p>
+        </div>
+      </div>
+
+      <div class="about__row">
+        <h3 class="about__label">Bench</h3>
+        <div class="about__content">
+          <p>Stem cell culture (hPSC), directed neural differentiation, 3D neuronal spheroids,
+            immunofluorescence microscopy, protein extraction and quantification, nucleic acid
+            extraction, gel electrophoresis, bacterial transformation, transfection, aseptic
+            technique.</p>
+          <p class="about__aside">Currently a research assistant at the UIUC Cellular Neuroscience Imaging Lab, working on cSLIM
+            images with Cellpose segmentation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact" aria-labelledby="contact-heading">
+    <h2 id="contact-heading" class="section-heading">Contact</h2>
+    <p class="contact__lede">I am interested in work on neural interfaces, signal decoding, and the instrumentation
+        behind both. Email is the best way to reach me.</p>
+    <ul class="contact__list">
+      <li><a href="mailto:berniedohrn1@gmail.com">berniedohrn1@gmail.com</a></li>
+      <li><a href="https://www.linkedin.com/in/bernie-dohrn-7a8239290">LinkedIn</a></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

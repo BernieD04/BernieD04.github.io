@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMG Hand Pose Estimation | Bernard Dohrn</title>
+<meta name="description" content="Reading hand pose from forearm EMG. A webcam running hand tracking labels the EMG as it records, so the training data needs no manual annotation.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">EMG Hand Pose Estimation</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">Apr 2026 - present</span>
+        <span class="project__meta-item">ISUR Program</span>
+        <span class="project__status"><span class="entry__status-mark" aria-hidden="true"></span>Active</span>
+      </p>
+
+    <p class="project__lede">A device that reads hand pose from forearm EMG, aimed at prosthetic control and brain-computer
+      interfaces. I am designing the analog front end myself.</p>
+
+    <div class="prose">
+      <p>Surface EMG from the forearm carries the drive going to the hand, mixed with noise, crosstalk
+        from neighboring muscles, and the summed contribution of every motor unit firing at
+        once. Extracting hand pose from it is a separation problem before it is a machine
+        learning one.</p>
+
+      <h2>Labeled data without labeling it</h2>
+
+      <p>Regressing hand pose from EMG needs a ground-truth pose for every EMG sample, and annotating
+        that by hand does not scale to a useful dataset. The rig therefore records both at
+        once: EMG from electrodes on the forearm, and MediaPipe hand landmarks from a webcam
+        pointed at the same hand. The camera labels the EMG, and a session produces paired
+        data requiring no manual annotation.</p>
+
+      <figure>
+        <a href="images/emg-data-collection.jpg">
+          <img src="images/emg-data-collection.jpg" width="1600" height="1197" loading="lazy" decoding="async"
+               alt="A monitor showing the data collection app. A person sits in front of a webcam with adhesive EMG electrodes and trailing wires taped to their forearm, holding one hand up to the camera. MediaPipe hand landmarks are drawn over that hand as red dots joined by white lines. A progress bar across the top reads 1.2 percent, and a second person stands beside them.">
+        </a>
+        <figcaption>A recording session in progress. The electrodes on the forearm and the
+          landmarks on the hand are captured in the same frame of time, which is what makes
+          the pairing work.</figcaption>
+      </figure>
+
+      <p>Each session opens with a calibration: hold the hand fully open, then close it into a fist.
+        That fixes the two ends of the curl range for the person and for that day's electrode
+        placement. One run came out at 12.0 degrees open and 151.4 degrees closed. Fixing the
+        endpoints per session matters because the raw angle drifts with electrode placement,
+        and a model trained on it would learn the placement rather than the gesture. After
+        calibration the instruction is to move the hand naturally while both streams record.</p>
+
+      <p>From there the pipeline runs collection, feature extraction, regression training, and a live
+        mode that runs the trained model against the incoming signal.</p>
+
+      <h2>Features, and what replaces them</h2>
+
+      <p>The current implementation extracts time-domain features from the EMG and classifies hand
+        gestures from them. That is sufficient for a system that works end to end, and it is
+        what the collection rig feeds.</p>
+
+      <p>I am now implementing convolutive ICA for motor unit decomposition, which is a substantially
+        harder problem. Each electrode sees a convolutive mixture: many motor units firing at
+        once, each one reaching the skin delayed and filtered differently by the tissue in
+        between. Decomposing that mixture into individual motor unit spike trains gives a more
+        direct measure of the neural command than any envelope of the bulk signal. It is
+        considerably harder than feature extraction, and it is not yet finished.</p>
+
+      <h2>Analog front end</h2>
+
+      <p>The rig today is four BioAmp Candy sensors into an Arduino Uno R4 Minima. Each sensor applies
+        a fixed gain of 2420 and an analog bandpass of 72 to 720 Hz, which covers the bulk of
+        surface EMG power. The setup records reliably and supports the collection sessions
+        above, but it limits how far the project can go, and the limit is in the sampling.</p>
+
+      <p>The R4 has a single ADC behind a multiplexer, so the four channels are read in turn rather
+        than together. That carries two costs: each channel is captured at a slightly
+        different instant, and the per-channel sample rate is the converter's total rate
+        divided by four.</p>
+
+      <p>Neither cost is significant for envelope features. Both are significant for convolutive ICA.
+        Separating motor units depends on the delays between electrodes as a potential
+        propagates along the muscle fiber, and a staggered sample clock corrupts exactly those
+        delays. Timing that the acquisition never captured cannot be recovered downstream,
+        regardless of how good the decomposition is.</p>
+
+      <p>The next step, and what I am designing now, is a custom board built for parallel channel
+        sampling with every channel on a shared clock. The amplification has to remain
+        low-noise enough to meet the acquisition requirements at the same time, and most of
+        the current component selection is a trade-off between the two.</p>
+
+    </div>
+
+    <p class="project__stack">Python<span aria-hidden="true"> · </span>MediaPipe<span aria-hidden="true"> · </span>Arduino<span aria-hidden="true"> · </span>Signal processing<span aria-hidden="true"> · </span>Analog circuit design</p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link pager__link--older" href="eeg-fmri-reconstruction.html">
+          <span class="pager__dir">Older project</span>
+          <span class="pager__title">Cross-Modal Brain Signal Reconstruction</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

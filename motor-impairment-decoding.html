@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEG-Based Motor Impairment Decoding | Bernard Dohrn</title>
+<meta name="description" content="Classifying stroke survivors against controls, and task effort level, from sensorimotor EEG. Five feature sets, two classifiers, 21 subjects.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">EEG-Based Motor Impairment Decoding</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">Jan - May 2026</span>
+        <span class="project__meta-item">NE 412, Neural Signal Analysis</span>
+        <span class="project__meta-item">Eight-author project</span>
+      </p>
+
+    <p class="project__lede">Stroke recovery is scored by hand, by a trained clinician, on a subjective scale. This project
+      tested how far EEG from sensorimotor cortex gets toward doing that objectively.</p>
+
+    <div class="prose">
+      <p>The Fugl-Meyer Assessment is the standard measure of upper-limb motor function after a stroke.
+        It is also subjective, takes a trained clinician to administer, and cannot be run
+        continuously or outside a clinic. An EEG-derived measure tracking the same thing would
+        remove all three constraints, which is the motivation for looking for one.</p>
+
+
+      <h2>Data and tasks</h2>
+
+      <p>EEG from 21 subjects, 14 stroke survivors and 7 healthy controls, recorded in Yuan Yang's lab
+        at Illinois. Subjects held shoulder abduction at two effort levels, 20% and 40% of
+        maximum voluntary contraction. That gave two classification questions: stroke against
+        control, and low effort against high effort.</p>
+
+      <p>Analysis was restricted to sensorimotor electrodes (FC1 to FC6, C1 to C6, CP1 to CP6, and the
+        midline FCz, Cz, CPz). Those sit over primary motor and somatosensory cortex, where
+        the mu and beta rhythms that respond to movement are generated. Dropping the rest cuts
+        noise from task-irrelevant regions and keeps the feature count down, which matters
+        particularly at 21 subjects.</p>
+
+      <h2>Features</h2>
+
+      <p>Four types, all computed in MNE-Python over one-second epochs:</p>
+
+      <ul>
+        <li><strong>Power spectral density</strong>, by Welch's method, over low beta
+          (13 to 20 Hz) and high beta (20 to 30 Hz). Local activity.</li>
+        <li><strong>Coherence</strong> between channel pairs. Network-level
+          synchronization.</li>
+        <li><strong>Imaginary coherence</strong>, which keeps only the time-lagged part
+          and so discards the zero-lag coupling that volume conduction produces rather
+          than real communication between regions.</li>
+        <li><strong>Phase lag</strong>, the timing offset between channel pairs.</li>
+      </ul>
+
+      <p>These were combined into five feature sets, from PSD alone up to everything at once, and each
+        set was run through both a logistic regression and a random forest. The aim was not to
+        identify a single best model but to determine which feature types carry the signal.</p>
+
+      <h2>Guarding against leakage</h2>
+
+      <p>With 21 subjects and many epochs each, splitting epochs at random would place the same subject
+        in both the training and test sets, producing an accuracy that largely reflects
+        subject identity. The split was made at subject level, 80/20, so every epoch from a
+        given person sits on one side only. Accuracy came from 5-fold stratified grouped
+        cross-validation, which keeps both the class balance and the subject grouping intact,
+        and feature standardization was fitted inside each fold rather than across the whole
+        set.</p>
+
+      <h2>Results</h2>
+
+      <table>
+        <caption>Stroke against control. Cross-validated accuracy.</caption>
+        <thead>
+          <tr><th scope="col">Feature set</th><th scope="col">Logistic regression</th><th scope="col">Random forest</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>All features</td><td>0.600</td><td>0.615</td></tr>
+          <tr><td>PSD only</td><td>0.575</td><td>0.665</td></tr>
+          <tr><td>PSD + coherence</td><td>0.550</td><td>0.615</td></tr>
+          <tr><td>PSD + coherence + imaginary coherence</td><td>0.500</td><td>0.575</td></tr>
+          <tr><td>PSD + phase lag</td><td>0.620</td><td>0.695</td></tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>20% against 40% maximum voluntary contraction. Cross-validated accuracy.</caption>
+        <thead>
+          <tr><th scope="col">Feature set</th><th scope="col">Logistic regression</th><th scope="col">Random forest</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>All features</td><td>0.575</td><td>0.555</td></tr>
+          <tr><td>PSD only</td><td>0.460</td><td>0.530</td></tr>
+          <tr><td>PSD + coherence</td><td>0.435</td><td>0.405</td></tr>
+          <tr><td>PSD + coherence + imaginary coherence</td><td>0.455</td><td>0.550</td></tr>
+          <tr><td>PSD + phase lag</td><td>0.545</td><td>0.450</td></tr>
+        </tbody>
+      </table>
+
+      <p>Best on stroke against control was the random forest on PSD plus phase lag, at 0.695 accuracy
+        and an AUC of 0.59. Effort level performed near chance: the best result was 0.575 with
+        an AUC of 0.56, and several feature sets fell at or below chance. Two low-effort
+        contractions do not separate at the group level with these features.</p>
+
+      <h2>What the feature sets showed</h2>
+
+      <p>The more informative result is the shape of the table rather than the best single number.
+        Adding coherence and then imaginary coherence made things consistently worse, with the
+        random forest falling from 0.665 on PSD alone to 0.615 and then 0.575. Adding phase
+        lag instead pushed it up to 0.695.</p>
+
+      <p>Adding features did not improve performance. Each connectivity measure adds a pair for every
+        channel combination, and against 21 subjects that added dimensionality produces
+        overfitting faster than signal. Phase lag held up where coherence did not, plausibly
+        because discounting zero-lag coupling removes much of what volume conduction
+        contributes, leaving fewer and less redundant features.</p>
+
+      <p>The two models also relied on different features. Feature importance put PSD far ahead for the
+        random forest, while the logistic regression spread its weight across the connectivity
+        measures, which fits the random forest doing better on the grosser
+        stroke-versus-control split and the logistic regression edging ahead on the subtler
+        effort task.</p>
+
+      <h2>Honest read</h2>
+
+      <p>An AUC of 0.59 is above chance, but not by much, and the error bars across folds are wide
+        enough to reflect real inter-subject variability. With 14 stroke survivors and 7
+        controls, a group-level model is being asked to generalize across people whose
+        post-stroke reorganization differs individually. The result supports EEG carrying
+        usable information about motor impairment; it does not support a clinical tool.</p>
+
+    </div>
+
+    <p class="project__stack">scikit-learn<span aria-hidden="true"> · </span>MNE-Python<span aria-hidden="true"> · </span>Logistic regression<span aria-hidden="true"> · </span>Random forest<span aria-hidden="true"> · </span>Feature engineering</p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link" href="eeg-fmri-reconstruction.html">
+          <span class="pager__dir">Newer project</span>
+          <span class="pager__title">Cross-Modal Brain Signal Reconstruction</span>
+        </a>
+        <a class="pager__link pager__link--older" href="openinteraction.html">
+          <span class="pager__dir">Older project</span>
+          <span class="pager__title">OpenInteraction</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EEG and EMG Neural Interface Software | Bernard Dohrn</title>
+<meta name="description" content="A year on the software side of the club, writing preprocessing and neural decoding pipelines for a full-body neural-controlled prosthetic.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">EEG and EMG Neural Interface Software</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">Aug 2024 - May 2025</span>
+        <span class="project__meta-item">Neurotech Club</span>
+      </p>
+
+    <p class="project__lede">A year on the software side of the club, writing preprocessing and neural decoding pipelines for a full-body neural-controlled prosthetic.</p>
+
+    <div class="prose">
+      <p>I wrote the EEG and EMG preprocessing and neural decoding pipelines, and trained PyTorch models to classify the signals. The wider project was a full-body neural-controlled prosthetic for neurodegenerative disorders, built by a team that spanned several disciplines.</p>
+
+      <p>A substantial part of my time went to validating the data pipelines and confirming that results held across recording sessions rather than only on the session they were tuned on.</p>
+
+      <!--
+        ADD DETAIL HERE.
+
+        Everything below is already styled, so you can paste it in and it will
+        match the rest of the site. Delete whatever you do not use. Do not add a
+        heading with nothing under it: an empty section reads worse than no
+        section at all.
+
+        <h2>Approach</h2>
+        <p>How you actually went about it.</p>
+
+        <h3>A smaller sub-point</h3>
+        <p>Text.</p>
+
+        <ul>
+          <li>A list, when the content is genuinely a list.</li>
+        </ul>
+
+        <figure>
+          <img src="images/something.png" alt="Describe what the image shows, specifically.">
+          <figcaption>What a reader should take from it.</figcaption>
+        </figure>
+
+        <table>
+          <caption>What the table is comparing.</caption>
+          <thead><tr><th scope="col">Method</th><th scope="col">Result</th></tr></thead>
+          <tbody><tr><td>Name</td><td>Value</td></tr></tbody>
+        </table>
+
+        <pre><code>code = "shown in mono, scrolls sideways if long"</code></pre>
+
+        <blockquote><p>A pulled-out point worth its own space.</p></blockquote>
+
+        Only put real numbers in here. If you do not have the figure to hand,
+        write the sentence without it rather than approximating.
+      -->
+    </div>
+
+    <p class="project__stack">PyTorch<span aria-hidden="true"> · </span>Signal preprocessing<span aria-hidden="true"> · </span>Neural decoding</p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link" href="openinteraction.html">
+          <span class="pager__dir">Newer project</span>
+          <span class="pager__title">OpenInteraction</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

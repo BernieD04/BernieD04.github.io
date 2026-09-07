@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cross-Modal Brain Signal Reconstruction | Bernard Dohrn</title>
+<meta name="description" content="Three architectures for predicting fMRI activation maps from EEG alone, including a transformer with cross-modal attention.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">Cross-Modal Brain Signal Reconstruction</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">Jan - May 2026</span>
+        <span class="project__meta-item">NE 422, Neural Imaging</span>
+        <span class="project__meta-item">Three-person project</span>
+      </p>
+
+    <p class="project__lede">EEG has millisecond timing but only a coarse, ill-posed account of where activity comes from.
+      fMRI answers that directly, at the cost of a scanner. This project asked whether a model
+      could learn the map between them.</p>
+
+    <div class="prose">
+      <p>EEG is cheap, portable, and fast enough to follow activity millisecond by millisecond.
+        Recovering where that activity came from is possible, through source localization and
+        dipole fitting, but the inverse problem is underdetermined: many source configurations
+        explain the same scalp recording equally well, so the estimate stays coarse and
+        degrades for deep sources. fMRI answers the spatial question directly, to the
+        millimeter, at the cost of a scanner that is expensive, immobile, and slow.</p>
+
+      <p>Source localization also solves for current sources, which is not the same quantity as a BOLD
+        activation map. This project approached the mapping directly rather than through the
+        biophysics: given EEG, predict the fMRI activation map that was recorded alongside it.</p>
+
+      <p>A three-person project with Jack Dohrn and John Parquette. I designed and built the
+        cross-modal transformer, the third of the three architectures below. Jack built the
+        preprocessing pipeline and the two EEGNet decoders.</p>
+
+      <h2>Data</h2>
+
+      <p>We used the Bondi 2025 simultaneous EEG-fMRI dataset: 17 subjects, three runs each, across six
+        motor conditions covering execution and imagery for each hand and the right foot. The
+        EEG side is 63 recorded channels downsampled to 250 Hz, 62 after dropping the ECG
+        channel; the fMRI side is whole-brain volumes in MNI space at a two second repetition
+        time, around 460 per run.</p>
+
+      <p>Epochs run from 0 to 3 seconds after task onset, and each one is stacked into a five-lag
+        representation spaced two seconds apart. That spacing is not arbitrary: the
+        hemodynamic response peaks around five to six seconds after the electrical event, so
+        the lags sample its rising phase and peak rather than only the instant the task began.
+        That alignment is what makes the mapping tractable.</p>
+
+      <p>Prediction targets came from a GLM fitted per run, using differential contrasts (right hand
+        minus left hand) so the target isolated lateralized motor cortex rather than
+        everything the brain does during a task. We split by subject, 13 for training and 2
+        each for validation and test, so no subject's data appeared on both sides of the
+        split.</p>
+
+      <h2>Three architectures</h2>
+
+      <p>We built three models against the same targets. They share the encoding problem and differ in
+        how the decoder treats the brain: as a flat list of voxels, as a volume, or as a set
+        of locations that can each attend to the EEG separately.</p>
+
+      <h3>EEGNet and an MLP decoder</h3>
+
+      <p>EEGNet is a compact CNN built for EEG: a temporal convolution that learns frequency-band
+        filters, then a depthwise spatial convolution that learns useful electrode
+        combinations. We used it as an encoder and mapped its output straight to voxel values
+        with an MLP. That decoder treats the brain as a flat list and predicts each voxel
+        independently, which is fast but throws away the fact that an fMRI volume is
+        three-dimensional.</p>
+
+      <h3>EEGNet and a U-Net decoder</h3>
+
+      <p>Same encoder, different decoder. The U-Net upsamples back to the full 79 x 95 x 79 volume, so
+        neighboring voxels are predicted together rather than in isolation.</p>
+
+      <h3>Transformer with cross-modal attention</h3>
+
+      <p>EEG is already a set of sequences, and the third model treats it as one. Frequency bands
+        become tokens carrying positional and channel embeddings, and each voxel's MNI
+        coordinate is encoded separately. Cross-attention layers then use the voxel embeddings
+        as queries and the EEG tokens as keys and values, so the model learns which EEG
+        features predict activation at a particular location instead of learning one fixed
+        mapping for the whole brain.</p>
+
+      <p>6.4 million parameters, four encoder and four decoder layers, 1,890 tokens per sample, trained
+        with Adam. The loss is a composite of weighted MSE, a Pearson correlation term, and a
+        variance-matching penalty.</p>
+
+      <p>The last two terms address a specific failure. MSE alone rewards predicting the mean, which is
+        what the MLP decoder did, so the correlation and variance terms penalize a flat
+        prediction. The failure mode was visible in the earlier models before this one was
+        trained, and the loss was designed against it.</p>
+
+      <h2>Results</h2>
+
+      <table>
+        <caption>Held-out test performance across the three architectures.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Model</th>
+            <th scope="col">MSE</th>
+            <th scope="col">MAE</th>
+            <th scope="col">R&sup2;</th>
+            <th scope="col">Correlation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>EEGNet + MLP</td><td>0.740</td><td>0.424</td><td>-0.226</td><td>0.0338</td></tr>
+          <tr><td>EEGNet + U-Net</td><td>0.960</td><td>0.467</td><td>-0.589</td><td>0.00256</td></tr>
+          <tr><td>Transformer</td><td>1.04</td><td>0.608</td><td>-0.0406</td><td>0.291</td></tr>
+        </tbody>
+      </table>
+
+      <p>All three have negative R&sup2;, so none outperforms predicting the mean volume. They differ
+        in what the predictions look like.</p>
+
+      <p>The MLP's failure has a specific name: mean collapse. Rather than responding to its EEG input
+        it learned to emit an average volume, which lowers MSE without predicting anything.
+        The maps show it clearly: the predicted row is a bare anatomical brain carrying a few
+        stray voxels.</p>
+
+      <figure>
+        <a class="plate" href="images/eeg-fmri-mlp-activation.jpg">
+          <img src="images/eeg-fmri-mlp-activation.jpg" width="2048" height="697" loading="lazy" decoding="async"
+               alt="Two rows of seven axial brain slices on an anatomical underlay. The top row, true fMRI activation, is densely covered with orange and blue clusters. The bottom row, the MLP's prediction, is almost entirely bare, carrying only two or three small specks of activation across all seven slices.">
+        </a>
+        <figcaption>True activation (top) against the MLP's prediction (bottom), subject
+          16 run 1, left hand execution, thresholded at |t| &gt; 2. Mean collapse made visible: the output barely differs from an empty volume. Select any figure for
+          the full-size version.</figcaption>
+      </figure>
+
+      <p>The U-Net's spatial decoder does produce structure. It places smooth, distinct clusters
+        instead of a blank volume, which is the benefit of predicting neighboring voxels
+        together. They are far sparser than the true activation and do not align with it, and
+        its correlation was the lowest of the three: sufficient capacity to generate plausible
+        maps, insufficient data to place them correctly.</p>
+
+      <figure>
+        <a class="plate" href="images/eeg-fmri-unet-activation.jpg">
+          <img src="images/eeg-fmri-unet-activation.jpg" width="2048" height="697" loading="lazy" decoding="async"
+               alt="The same seven axial slices and the same densely activated true row. The bottom row, the U-Net's prediction, shows roughly six isolated smooth blobs across the seven slices, far sparser than the true maps and in different locations.">
+        </a>
+        <figcaption>The same subject and threshold with the U-Net decoder. The predictions
+          have structure but sit in the wrong places, which a correlation of 0.00256
+          reflects.</figcaption>
+      </figure>
+
+      <p>The transformer reached the highest correlation of the three, and an SSIM of 0.443 against the
+        true maps.</p>
+
+      <figure>
+        <a class="plate" href="images/eeg-fmri-transformer-activation.jpg">
+          <img src="images/eeg-fmri-transformer-activation.jpg" width="1871" height="705" loading="lazy" decoding="async"
+               alt="Two rows of seven axial brain slices on a black background. The top row is true fMRI activation, the bottom row is the transformer's prediction. Predicted activation falls in broadly the same regions but appears as smoother, larger blobs, and the empty end slices stay empty in both rows.">
+        </a>
+        <figcaption>True activation (top) against the transformer's prediction (bottom).
+          The model puts activation in broadly the right places and smooths away the finer
+          structure, which is what a correlation of 0.291 alongside a negative R&sup2;
+          looks like.</figcaption>
+      </figure>
+
+      <p>One caveat applies to reading the three figures side by side. The MLP and U-Net panels are the
+        same subject and run, thresholded at |t| &gt; 2 over an anatomical underlay, while the
+        transformer panel is a cross-validation fold thresholded at |t| &gt; 0.5 without one.
+        They show the character of each model's output, not a like-for-like comparison.</p>
+
+      <h2>Why the numbers land where they do</h2>
+
+      <p>Primarily data, and partly a choice about prediction targets. E2fNet, the closest published
+        comparison, trained on 14,688 paired samples by predicting raw BOLD one sample per TR.
+        We fitted a GLM across trials to get t-statistic contrast maps instead. Those are
+        cleaner targets, but they collapse many volumes into a single training example, so 13
+        training subjects across three runs and six conditions yields far fewer pairs than a
+        per-TR scheme would. That choice of target cost most of the available sample count.</p>
+
+      <p>E2fNet also worked from resting state. Six motor conditions add trial-to-trial variability,
+        and motor execution and imagery produce less stereotyped responses than rest, so the
+        mapping is harder to learn and generalizes across subjects less well. Training ran on
+        laptop GPUs, which capped the transformer at six epochs, and validation loss was
+        visibly unstable across a two-subject validation set. Testing on held-out subjects
+        rather than held-out trials is also a demanding evaluation: a within-subject or
+        subject-adapted model would likely score better.</p>
+
+      <p>One modeling choice is a clear limitation: rest epochs were treated as zero activation, which
+        is not what a resting brain does.</p>
+
+      <h2>References</h2>
+
+      <ul>
+        <li>Bondi et al. (2025), the dataset.
+          <a href="https://doi.org/10.1016/j.neuroimage.2025.121311">NeuroImage 121311</a></li>
+        <li>Roos, Fukuda and Cap (2025), E2fNet, the comparison model.
+          <a href="https://arxiv.org/abs/2502.08025">arXiv:2502.08025</a></li>
+        <li>Lawhern et al. (2018), EEGNet.
+          <a href="https://doi.org/10.1088/1741-2552/aace8c">J. Neural Eng. 15(5)</a></li>
+      </ul>
+
+    </div>
+
+    <p class="project__stack">PyTorch<span aria-hidden="true"> · </span>MNE-Python<span aria-hidden="true"> · </span>Nilearn<span aria-hidden="true"> · </span>EEGNet<span aria-hidden="true"> · </span>U-Net<span aria-hidden="true"> · </span>Transformers</p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link" href="emg-hand-pose.html">
+          <span class="pager__dir">Newer project</span>
+          <span class="pager__title">EMG Hand Pose Estimation</span>
+        </a>
+        <a class="pager__link pager__link--older" href="motor-impairment-decoding.html">
+          <span class="pager__dir">Older project</span>
+          <span class="pager__title">EEG-Based Motor Impairment Decoding</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

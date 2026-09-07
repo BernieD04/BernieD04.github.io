@@ -1,0 +1,802 @@
+/*
+  Bernard Dohrn, portfolio.
+  Direction, palette reasoning, and dials live in DESIGN.md.
+  Dials held here: ENERGY 2 / RHYTHM 2 / MOTION 1.
+*/
+
+/* Tokens */
+
+:root {
+  /* Dark is the default: it is the stated brand direction, not a trend. */
+  --ground:     #16150F;
+  --surface:    #1E1C15;
+  --ink:        #EFE9D9;
+  --ink-muted:  #ADA48C;
+  --edge:       #6B6455;
+  --rule:       #35322A;
+  --accent:     #7FE86B;
+
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-sans:  'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:  'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  /* Two radii only. Nothing on this page is a pill. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  --measure: 62ch;
+
+  /* One container width and one gutter, shared by the masthead, the sections,
+     and the footer, so all three land on the same left edge. */
+  --container: 62rem;
+  --gutter: 1.25rem;
+}
+
+:root[data-theme="light"] {
+  --ground:     #F6F1E4;
+  --surface:    #FFFCF3;
+  --ink:        #191710;
+  --ink-muted:  #57503F;
+  --edge:       #8A8271;
+  --rule:       #DDD5C2;
+  --accent:     #256E1F;
+}
+
+/* Base */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  /* Fluid, so the body text has a mobile register of its own. */
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  /* Overflow is prevented at the source (minmax(0,1fr) tracks, max-widths)
+     rather than clipped here: overflow-x on html or body would create a
+     scroll container and break the sticky masthead. This only catches a
+     pathological unbroken string. */
+  overflow-wrap: break-word;
+}
+
+p { margin: 0 0 1.1em; max-width: var(--measure); }
+p:last-child { margin-bottom: 0; }
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--edge);
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 120ms ease, color 120ms ease;
+}
+
+/* MOTION 1: hover and focus are the only places anything moves. */
+a:hover { text-decoration-color: var(--accent); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition-duration: 0.01ms !important; }
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top 120ms ease;
+}
+.skip-link:focus { top: 0.75rem; }
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--ink-muted);
+}
+
+/* Masthead */
+
+/*
+  Mobile gets two rows and no stickiness: one row cannot hold the name, three
+  links, and the toggle at 375px without cramping the tap targets, and a tall
+  sticky bar would eat the screen. From 40rem it fits on one row, so it sticks.
+*/
+/* The bar itself is full bleed so its rule spans the viewport; the inner
+   wrapper is what aligns with the content column. */
+.masthead {
+  padding: 0 var(--gutter);
+  border-bottom: 1px solid var(--rule);
+  background: var(--ground);
+}
+
+.masthead__inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.masthead__name {
+  /* Matches the 44px minimum the nav links already carry: it is a real link
+     to the top of the page, so it is a real tap target. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  align-self: flex-start;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+.masthead__name:hover { text-decoration: underline; text-decoration-color: var(--accent); }
+
+.masthead__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: -0.6rem;
+}
+
+.masthead__nav a {
+  /* 44px minimum touch target, with spacing between neighbors. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.6rem;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+.masthead__nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+
+.theme-toggle {
+  min-height: 44px;
+  min-width: 64px;
+  margin-left: auto;
+  padding: 0 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.theme-toggle:hover { color: var(--ink); border-color: var(--ink-muted); }
+
+/* Shared layout */
+
+main { padding: 0 var(--gutter); }
+
+.intro,
+.work,
+.about,
+.contact {
+  max-width: var(--container);
+  margin: 0 auto;
+}
+
+/* Sections carry deliberately different vertical registers rather than one
+   uniform pad: the intro opens wide, work is dense, contact closes tight. */
+.intro   { padding: 5rem 0 3rem; }
+.work    { padding: 1rem 0 2.5rem; }
+.about   { padding: 3rem 0 2.5rem; border-top: 1px solid var(--rule); }
+.contact { padding: 2.5rem 0 3.5rem; border-top: 1px solid var(--rule); }
+
+/* Breathing room above a jumped-to section. These ids exist only on the index,
+   which no longer has a sticky bar to clear, so this is spacing, not clearance. */
+#work, #about, #contact { scroll-margin-top: 2rem; }
+
+.section-heading {
+  margin: 0 0 2rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  /* Modest tracking to separate the label from prose. Not the wide-tracked
+     uppercase display treatment; it stays small and quiet. */
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* Intro */
+
+.intro { position: relative; }
+
+/*
+  The identity block is centered; the prose below it is not. The change in
+  alignment is what separates the header from the content, and the content then
+  shares its left edge with every section further down the page.
+*/
+.intro__identity {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+/*
+  On the index the toggle sits in the page's top-right corner, which is where it
+  already sits inside the masthead on the project pages, so it does not move
+  between page types.
+*/
+.intro > .theme-toggle {
+  position: absolute;
+  top: 1.25rem;
+  right: 0;
+  margin: 0;
+}
+
+/* The name is the page's h1: on a personal site it is the thing being named,
+   and it gives the index an opening the masthead wordmark is too small to be. */
+.intro__name {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4.25rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+/* Set in the same mono as the project rails, so the page opens in a voice it
+   goes on to use rather than introducing a second one for the header alone. */
+.intro__disciplines {
+  margin: 0 0 1.5rem;
+  max-width: none;
+  font-family: var(--font-mono);
+  /* Same size as the project rails, so it reads as a label on the name rather
+     than a line of its own. */
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/*
+  The index carries its navigation here rather than in a bar. The name is already
+  the largest thing on the page, so a sticky wordmark above it would say the same
+  thing twice. Project pages keep the masthead: they have no hero to hold this,
+  and their write-ups are long enough to need nav that stays put.
+*/
+.hero-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 1.25rem;
+  margin: 0;
+}
+
+.hero-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.6rem;
+  font-size: 1rem;
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+.hero-nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+
+.intro__lede + .intro__lede { margin-top: 1.1em; }
+
+.intro__lede {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  color: var(--ink);
+  max-width: 58ch;
+}
+
+/* Work entries */
+
+/*
+  The metadata rail is the identity motif: date, program, status, set in mono
+  like the channel labels down the edge of a recording. It carries real data,
+  so it is structure rather than a decorative stripe. It stacks above the entry
+  on narrow screens instead of being dropped.
+*/
+.entry {
+  padding: 2rem 0;
+  border-top: 1px solid var(--rule);
+}
+.entry:first-of-type { border-top: none; padding-top: 0; }
+
+.entry__rail {
+  margin: 0 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.entry__rail p { margin: 0 0 0.35rem; max-width: none; }
+.entry__rail p:last-child { margin-bottom: 0; }
+
+.entry__dates { color: var(--ink); }
+
+.entry__status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+}
+/* The word "Active" carries the meaning; the mark only reinforces it, so the
+   status is never communicated by color alone. */
+.entry__status-mark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+.entry__title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 1.15rem + 0.85vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.entry__stack {
+  margin-top: 1.1em;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+/* Two 44px targets separated only by a whitespace node sit about 4px apart,
+   which is a coin flip under a thumb. The gap is the other half of tappability. */
+.entry__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.75rem;
+  margin-top: 0.9em;
+  font-size: 0.9375rem;
+}
+.entry__links a { min-height: 44px; display: inline-flex; align-items: center; }
+
+/* About */
+
+/*
+  A different composition from Work on purpose (RHYTHM 2): no rail, run-in
+  labels above their content, single measure. Two sections that share a layout
+  read as a template.
+*/
+.about__row { margin-bottom: 2rem; }
+.about__row:last-child { margin-bottom: 0; }
+
+.about__label {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.about__lead { max-width: 56ch; }
+
+.about__aside {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  max-width: 56ch;
+}
+
+.about__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+}
+.about__list li {
+  padding: 0.25rem 0;
+  display: flex;
+  gap: 0.6rem;
+}
+.about__list .code { flex: none; min-width: 5.5rem; }
+
+/* Marks a course that has not been taken yet, so the list cannot be read as a
+   claim about completed work. */
+.about__when {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+/* Contact */
+
+.contact__lede { max-width: 52ch; }
+
+.contact__list {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.contact__list li { margin-bottom: 0.25rem; }
+.contact__list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 1.0625rem;
+}
+
+/* Footer */
+
+.footer {
+  padding: 0 var(--gutter);
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.footer__inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 1.5rem 0 2.5rem;
+  border-top: 1px solid var(--rule);
+}
+.footer__inner p { margin: 0; }
+
+/* Project pages */
+
+/*
+  A project page is a third composition, not the index entry enlarged. The rail
+  turns on its side: the same mono metadata runs as one horizontal strip under
+  the title, where a detail page has the width for it and no neighboring
+  entries to line up against.
+*/
+.project {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 2rem 0 1rem;
+}
+
+.project__back {
+  margin: 0 0 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+.project__back a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-muted);
+}
+.project__back a:hover { color: var(--ink); }
+
+.project__title {
+  margin: 0 0 0.9rem;
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 1.3rem + 2.1vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+
+.project__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.1rem;
+  margin: 0 0 1.5rem;
+  max-width: none;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.project__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+}
+
+.project__lede {
+  margin: 0 0 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  max-width: 56ch;
+}
+
+.project__stack {
+  margin-top: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+/* Prose.
+   Styling for detail that has not been written yet, so pasted-in headings,
+   figures, tables and code land already matching the page. */
+
+.prose { max-width: var(--measure); }
+
+.prose h2 {
+  margin: 2.5rem 0 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.prose h3 {
+  margin: 1.75rem 0 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.prose ul, .prose ol { margin: 0 0 1.1em; padding-left: 1.15rem; }
+.prose li { margin-bottom: 0.35em; }
+
+/* A citation link is short and sits inline, which leaves it around 21px tall and
+   well under the 44px tap minimum. The padding buys the hit area; the list
+   spacing keeps two neighboring targets from overlapping under a thumb. */
+.prose li a {
+  display: inline-block;
+  padding: 0.65rem 0;
+}
+.prose li:has(a) { margin-bottom: 0.15em; }
+
+.prose figure {
+  margin: 2rem 0;
+  max-width: none;
+}
+.prose img { display: block; max-width: 100%; height: auto; border-radius: var(--radius-sm); }
+
+/*
+  Matplotlib exports carry their own white ground and black axis labels, so they
+  cannot sit directly on the dark theme. The plate turns that into a deliberate
+  printed-figure treatment rather than a glaring rectangle, and it holds the same
+  value in both themes because the image itself does not change with the theme.
+  The caption stays outside the plate so it keeps the site's text colors.
+*/
+/* A figure wrapped in a link must not inherit the body underline. The image is
+   the affordance; a rule drawn under it is just a stray line. */
+.prose figure > a { display: block; text-decoration: none; }
+
+/* An embedded player has no intrinsic size to lay out against, so the wrapper
+   carries the aspect ratio and the iframe fills it. */
+.prose .video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.prose .video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.prose .plate {
+  display: block;
+  padding: 0.75rem;
+  background: #FFFCF3;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+.prose .plate img { border-radius: 0; }
+.prose figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  max-width: 56ch;
+}
+
+/* Tables scroll inside themselves rather than pushing the page sideways. */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  margin: 1.75rem 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.prose caption {
+  margin-bottom: 0.6rem;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  text-align: left;
+}
+.prose th, .prose td {
+  padding: 0.5rem 1rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+.prose th { font-weight: 600; }
+
+.prose pre {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+}
+.prose pre code { font-size: 0.8125rem; color: var(--ink); }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+.prose blockquote {
+  margin: 1.75rem 0;
+  padding-left: 1.1rem;
+  /* The rule marks quoted material, which is information, not decoration. */
+  border-left: 2px solid var(--edge);
+  color: var(--ink-muted);
+}
+
+/* Pager */
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 1.75rem 0 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.pager__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 44px;
+  justify-content: center;
+  padding: 0.5rem 0;
+  text-decoration: none;
+}
+/* When only the older link exists it still sits right, so the two pages read
+   as one consistent pair rather than jumping sides. */
+.pager__link--older { margin-left: auto; text-align: right; align-items: flex-end; }
+
+.pager__dir {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+.pager__title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.pager__link:hover .pager__title {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.22em;
+}
+
+/* Index entry titles link through.
+   No resting underline: an underline on every heading turns the list into a
+   wall of rules. It appears on hover and focus, where it confirms the target. */
+.entry__title a {
+  /* A one-line title is only ~27px tall, so short names like "OpenInteraction"
+     fell under the 44px tap minimum while longer ones passed purely because
+     they wrapped. The padding buys the hit area; the matching negative margin
+     gives it back to the layout, so spacing is unchanged. */
+  display: inline-block;
+  padding: 0.6rem 0;
+  margin: -0.6rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+.entry__title a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 2px;
+}
+
+/* Breakpoints */
+
+/*
+  40rem: the masthead's name, links, and toggle now fit on one row, so it
+  becomes a single compact sticky bar.
+*/
+@media (min-width: 40rem) {
+  /* One gutter change moves the masthead, the sections, and the footer
+     together, so the shared left edge survives the breakpoint. */
+  :root { --gutter: 2rem; }
+
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .masthead__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .masthead__nav { margin-left: 0; gap: 0.5rem; }
+  .theme-toggle { margin-left: 0.75rem; }
+
+  .intro   { padding: 5rem 0 4rem; }
+  .work    { padding: 1.5rem 0 3.5rem; }
+  .about   { padding: 4rem 0 3.5rem; }
+  .contact { padding: 3.5rem 0 4.5rem; }
+
+  .project { padding: 3rem 0 1.5rem; }
+  .pager   { padding: 2.5rem 0 1.5rem; }
+}
+
+/*
+  56rem: there is finally room for a 11rem rail beside a readable measure, so
+  the entry splits into rail and body. Below this it stays stacked, because a
+  squeezed rail would starve the prose column.
+*/
+@media (min-width: 56rem) {
+  .entry {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 2.75rem;
+    padding: 2.5rem 0;
+  }
+  .entry__rail { margin: 0; text-align: right; }
+  .entry__status { justify-content: flex-end; }
+
+  /*
+    About deliberately does NOT take the rail grid that Work uses. It stays a
+    single flowing column with run-in serif labels, offset to sit under the
+    section heading. Two sections sharing one geometry is how a page starts
+    reading as a template.
+  */
+  .about__row { margin-bottom: 2.75rem; }
+
+  .about__list { columns: 2; column-gap: 2.5rem; }
+  .about__list li { break-inside: avoid; }
+
+  /*
+    Prose is capped at a reading measure, but a plot is not prose: a seven-slice
+    comparison at 62ch is unreadable. Figures break out to the full container
+    width instead. They share the container's left edge, so widening to the
+    container width lands exactly on its right edge and cannot overflow; the
+    min() keeps that true when the viewport is narrower than the container.
+  */
+  .prose figure {
+    width: min(var(--container), calc(100vw - 2 * var(--gutter)));
+  }
+  .prose figcaption { max-width: 62ch; }
+
+  /* Opt out of the breakout for an image whose native width is smaller than the
+     container. Stretching a UI screenshot past its own pixels only blurs the
+     text that made it worth showing. */
+  .prose figure.narrow { width: auto; }
+}

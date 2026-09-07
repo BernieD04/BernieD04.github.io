@@ -1,0 +1,13 @@
+# Single-file preview built for claude.ai, and the script that builds it.
+# Neither is part of the deployed site.
+artifact.html
+build-artifact.py
+
+# Working documents, kept local rather than published with the site.
+CLAUDE.md
+DESIGN.md
+NOTES.md
+
+__pycache__/
+Thumbs.db
+.DS_Store

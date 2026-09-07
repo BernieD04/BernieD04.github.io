@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenInteraction | Bernard Dohrn</title>
+<meta name="description" content="Hands-free desktop control from one webcam: gaze, head pose, and blink detection mapped to cursor and keyboard. Built at NeuroHack Fall 2025.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">OpenInteraction</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">Nov 2025</span>
+        <span class="project__meta-item">NeuroHack Fall 2025</span>
+        <span class="project__meta-item">Second place</span>
+        <span class="project__meta-item">Two-person project</span>
+      </p>
+
+    <p class="project__lede">A way to drive a desktop computer with no hands, using eye tracking, head pose, and blink
+      detection off a single webcam.</p>
+
+    <div class="prose">
+      <p>Systems that let someone control a computer without their hands already exist commercially.
+        They are also expensive, closed source, and hard to adapt to one particular person's
+        range of movement, which is a problem given that the people who most need them often
+        have the least typical range of movement. The premise was that a webcam and open
+        models cover a useful part of that ground, and that the person using the system should
+        be the one configuring it.</p>
+
+      <p>Built with Jack Dohrn over NeuroHack Fall 2025, where it placed second. We worked across all
+        of it together rather than splitting it into separate pieces.</p>
+
+      <figure>
+        <div class="video" data-poster="images/openinteraction-demo-poster.jpg">
+          <iframe src="https://player.vimeo.com/video/1137435765"
+                  title="OpenInteraction demo: driving the cursor by eye movement"
+                  allow="fullscreen; picture-in-picture" allowfullscreen
+                  loading="lazy"></iframe>
+        </div>
+        <figcaption>A demonstration of the software in use.</figcaption>
+      </figure>
+
+      <h2>What it does</h2>
+
+      <p>Three input channels come off one camera: gaze direction from a machine-learning gaze model,
+        head pose from MediaPipe's 3D face mesh, and blink detection with an optional double
+        blink as a click. Those map onto cursor movement and arbitrary key bindings through a
+        handler layer, so what a given gesture does is configuration rather than code. Live
+        overlays draw where the system thinks you are looking and how your head is turned, and
+        hotkeys pause, recenter, or exit without requiring a mouse.</p>
+
+      <figure class="narrow">
+        <a class="plate" href="images/openinteraction-settings.jpg">
+          <img src="images/openinteraction-settings.jpg" width="628" height="573" loading="lazy" decoding="async"
+               alt="The OpenInteraction settings window. Two columns headed Eye Control and Head Control hold dropdowns and numeric fields for action type, horizontal and vertical thresholds, overlay size and mouse range, plus checkboxes for blink as click and double blink. An Other Settings section below maps the directional buttons to W, A, S and D. A footer row lists the hotkeys: escape to exit, C to recenter, P to pause tracking.">
+        </a>
+        <figcaption>The settings window. Thresholds, overlay sizes, and every key binding
+          are exposed rather than compiled in, which is the central argument: the person using it tunes it to their own range of movement rather than adapting to someone else's defaults.</figcaption>
+      </figure>
+
+      <h2>How it fits together</h2>
+
+      <p>The system is written in Python throughout. OpenCV takes the camera, EyeTrax supplies the gaze
+        estimate, MediaPipe Face Mesh supplies head pose. Output from both is far too noisy to
+        point with, so it passes through KDE smoothing before it reaches the cursor. PyQt5
+        renders the overlays, Tkinter runs the settings GUI, pynput handles key simulation and
+        global hotkeys, and pyautogui moves the cursor. Settings are stored in JSON, so a
+        configuration tuned to one person survives a restart.</p>
+
+      <h2>The hard parts</h2>
+
+      <p>The tracking itself took the first day. The remaining work went into making the output usable:</p>
+
+      <ul>
+        <li>Gaze estimates jitter, and smoothing that jitter introduces latency. Beyond a certain point, a lagging cursor is harder to use than an unsteady one.</li>
+        <li>Mapping gaze coordinates onto screen space, and keeping that mapping honest as
+          the head drifts away from where calibration happened.</li>
+        <li>Blink detection that survives changing light without reading a slow blink as a
+          click.</li>
+        <li>Running Tkinter and PyQt in one process, which means two event loops that do
+          not naturally coexist.</li>
+        <li>Race conditions when the settings GUI wrote config while the tracking loop was
+          reading it.</li>
+        <li>Overlays that flickered, or moved off the screen entirely.</li>
+      </ul>
+
+      <p>None of these are visible in a working demo, and all of them separate a tracking script from
+        something a person can actually use.</p>
+
+    </div>
+
+    <p class="project__stack">Python<span aria-hidden="true"> · </span>OpenCV<span aria-hidden="true"> · </span>MediaPipe<span aria-hidden="true"> · </span>EyeTrax<span aria-hidden="true"> · </span>PyQt5<span aria-hidden="true"> · </span>Tkinter</p>
+    <p class="entry__links">
+      <a href="https://github.com/jellyfishtacoz/OpenInteraction">Source on GitHub</a>
+      <a href="https://vimeo.com/1137435765">Demo video</a>
+      <a href="https://devpost.com/software/openinteraction">Devpost entry</a>
+    </p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link" href="motor-impairment-decoding.html">
+          <span class="pager__dir">Newer project</span>
+          <span class="pager__title">EEG-Based Motor Impairment Decoding</span>
+        </a>
+        <a class="pager__link pager__link--older" href="neurotech-interface-software.html">
+          <span class="pager__dir">Older project</span>
+          <span class="pager__title">EEG and EMG Neural Interface Software</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
