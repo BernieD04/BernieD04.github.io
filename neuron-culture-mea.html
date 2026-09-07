@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stem Cell Derived Neurons on an HD-MEA | Bernard Dohrn</title>
+<meta name="description" content="Culturing neurons from stem cells and recording their activity on a high-density microelectrode array. Early stage, no results yet.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">Stem Cell Derived Neurons on an HD-MEA</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">2026 - present</span>
+        <span class="project__meta-item">Cellular Neuroscience Imaging Lab</span>
+        <span class="project__status"><span class="entry__status-mark" aria-hidden="true"></span>Active</span>
+      </p>
+
+    <p class="project__lede">Culturing neurons from stem cells and recording their activity on a high-density microelectrode array. This one is just beginning.</p>
+
+    <div class="prose">
+      <p>The preparation is neurons differentiated from stem cells. The recording side is a
+        3Brain CorePlate 1W, a single-well high-density microelectrode array that samples
+        extracellular activity at many points across a culture at once.</p>
+
+      <p>Both halves are still being set up. There is nothing to report yet, and the current
+        work is building the recording and analysis workflow rather than producing a
+        result.</p>
+
+      <p>The signal problem is close to the EMG project. Sorting spikes out of a dense
+        extracellular recording is the same class of problem as decomposing motor unit
+        spike trains out of surface EMG, which is what I am implementing there. What
+        differs is the preparation: here the neurons are differentiated and the network
+        grown before anything is recorded, so the biology is part of the experiment rather
+        than something taken as given.</p>
+    </div>
+
+    <p class="project__stack">Cell culture<span aria-hidden="true"> · </span>Stem cell differentiation<span aria-hidden="true"> · </span>HD-MEA<span aria-hidden="true"> · </span>Electrophysiology</p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link" href="emg-hand-pose.html">
+          <span class="pager__dir">Newer project</span>
+          <span class="pager__title">EMG Hand Pose Estimation</span>
+        </a>
+        <a class="pager__link pager__link--older" href="eeg-fmri-reconstruction.html">
+          <span class="pager__dir">Older project</span>
+          <span class="pager__title">Cross-Modal Brain Signal Reconstruction</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
