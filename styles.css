@@ -704,17 +704,26 @@ main { padding: 0 var(--gutter); }
   font-family: var(--font-serif);
   font-size: 1.05rem;
   font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--edge);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
 }
 .pager__link:hover .pager__title {
-  text-decoration: underline;
   text-decoration-color: var(--accent);
-  text-underline-offset: 0.22em;
+  text-decoration-thickness: 2px;
 }
 
-/* Index entry titles link through.
-   No resting underline: an underline on every heading turns the list into a
-   wall of rules. It appears on hover and focus, where it confirms the target. */
+/* Index entry titles link through. They carry the same underline every other
+   link on the site has, in the muted edge color so six of them do not read as a
+   wall of rules, and it thickens to the accent on hover. Without a resting
+   underline there was no affordance at all on a touch screen, where hover
+   never happens. */
 .entry__title a {
+  text-decoration: underline;
+  text-decoration-color: var(--edge);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
   /* A one-line title is only ~27px tall, so short names like "OpenInteraction"
      fell under the 44px tap minimum while longer ones passed purely because
      they wrapped. The padding buys the hit area; the matching negative margin
@@ -722,13 +731,10 @@ main { padding: 0 var(--gutter); }
   display: inline-block;
   padding: 0.6rem 0;
   margin: -0.6rem 0;
-  text-decoration: none;
   color: inherit;
 }
 .entry__title a:hover {
-  text-decoration: underline;
   text-decoration-color: var(--accent);
-  text-underline-offset: 0.16em;
   text-decoration-thickness: 2px;
 }
 
