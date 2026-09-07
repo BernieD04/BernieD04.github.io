@@ -434,7 +434,10 @@ main { padding: 0 var(--gutter); }
   padding: 0;
   list-style: none;
 }
-.contact__list li { margin-bottom: 0.25rem; }
+/* Three stacked 44px targets sat 4px apart, which is close enough for a thumb
+   to catch the wrong one. Spacing is the other half of a usable tap target. */
+.contact__list li { margin-bottom: 0.6rem; }
+.contact__list li:last-child { margin-bottom: 0; }
 .contact__list a {
   display: inline-flex;
   align-items: center;
