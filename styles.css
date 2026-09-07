@@ -466,8 +466,14 @@ main { padding: 0 var(--gutter); }
   the title, where a detail page has the width for it and no neighboring
   entries to line up against.
 */
+/*
+  The article column is the reading measure. Sizing it to the container instead
+  left the text against one edge of a much wider block, and the horizontal rules
+  ran on past the text, which read as unresolved rather than deliberate. Figures
+  break out beyond this column; see the breakpoint block.
+*/
 .project {
-  max-width: var(--container);
+  max-width: var(--measure);
   margin: 0 auto;
   padding: 2rem 0 1rem;
 }
@@ -520,7 +526,7 @@ main { padding: 0 var(--gutter); }
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--rule);
   font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-  max-width: 56ch;
+  max-width: none;
 }
 
 .project__stack {
@@ -667,7 +673,7 @@ main { padding: 0 var(--gutter); }
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 2rem;
-  max-width: var(--container);
+  max-width: var(--measure);
   margin: 0 auto;
   padding: 1.75rem 0 1rem;
   border-top: 1px solid var(--rule);
@@ -785,18 +791,22 @@ main { padding: 0 var(--gutter); }
 
   /*
     Prose is capped at a reading measure, but a plot is not prose: a seven-slice
-    comparison at 62ch is unreadable. Figures break out to the full container
-    width instead. They share the container's left edge, so widening to the
-    container width lands exactly on its right edge and cannot overflow; the
-    min() keeps that true when the viewport is narrower than the container.
+    comparison at 62ch is unreadable. Figures widen past the column and center on
+    the viewport, so they stay symmetrical with the text above and below them.
   */
   .prose figure {
     width: min(var(--container), calc(100vw - 2 * var(--gutter)));
+    margin-left: 50%;
+    transform: translateX(-50%);
   }
   .prose figcaption { max-width: 62ch; }
 
-  /* Opt out of the breakout for an image whose native width is smaller than the
-     container. Stretching a UI screenshot past its own pixels only blurs the
-     text that made it worth showing. */
-  .prose figure.narrow { width: auto; }
+  /* Opt out for an image whose native width is smaller than the column: it stays
+     in the text column rather than breaking out, and stretching a UI screenshot
+     past its own pixels only blurs the text that made it worth showing. */
+  .prose figure.narrow {
+    width: auto;
+    margin-left: 0;
+    transform: none;
+  }
 }
