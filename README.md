@@ -11,6 +11,8 @@ Static HTML, CSS, and one small script. No build step, no dependencies, no frame
     images/                            figures and photographs
 
     emg-hand-pose.html                 one page per project, newest first
+    neuron-culture-mea.html
+    software-rasterizer.html
     eeg-fmri-reconstruction.html
     motor-impairment-decoding.html
     openinteraction.html
@@ -48,7 +50,7 @@ Copy the closest existing page, then:
    neighbors, and update those neighbors to point back at it.
 3. Add an entry to the Work list in `index.html`, matching the shape of an existing one.
 
-The navigation is duplicated across all six pages, which is the cost of having no build
+The navigation is duplicated across all eight pages, which is the cost of having no build
 step. A change to a nav link has to be made everywhere.
 
 ## Writing a project page

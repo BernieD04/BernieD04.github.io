@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software Rasterizer in C++ | Bernard Dohrn</title>
+<meta name="description" content="A rasterizer written from scratch in C++ that reproduces the core of the WebGL pipeline in software: parse a scene description, fill triangles, write a PNG.">
+
+<!-- Applied before first paint so a saved light theme never flashes dark. -->
+<script>
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead" id="top">
+  <div class="masthead__inner">
+    <a class="masthead__name" href="index.html">Bernard Dohrn</a>
+    <nav class="masthead__nav" aria-label="Sections">
+      <a href="index.html#work">Work</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme">Light</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <article class="project">
+    <p class="project__back"><a href="index.html#work">All work</a></p>
+
+    <h1 class="project__title">Software Rasterizer in C++</h1>
+
+    <p class="project__meta">
+        <span class="project__meta-item">Fall 2026</span>
+        <span class="project__meta-item">CS 418, Interactive Computer Graphics</span>
+      </p>
+
+    <p class="project__lede">A rasterizer written from scratch in C++ that reproduces the core of the WebGL pipeline in software: it parses a scene description, fills triangles, and writes a PNG.</p>
+
+    <div class="prose">
+      <p>This is the largest machine problem in CS 418, and the course is direct about why it
+        assigns it: to show there is no magic in graphics by revealing how each piece of a
+        current graphics system works. Calling WebGL means handing geometry to a pipeline
+        somebody else wrote. This assignment is that pipeline, rebuilt by hand, running on
+        the CPU.</p>
+
+      <h2>What the program does</h2>
+
+      <p>Input is a text file of commands. Some set state, such as the vertex position and color
+        buffers; others issue a draw. The program reads the file line by line, updating its
+        state as it goes, and when it reaches a draw command it rasterizes using whatever
+        state is current at that point. The first line declares the output image: width,
+        height, and filename. What comes out is a single PNG. The whole thing builds and
+        runs through a Makefile.</p>
+
+      <p>The shape of that is worth noticing. It is a state machine followed by a draw call,
+        which is exactly the shape of the real API. Writing it is what made the real API's
+        design feel like a consequence rather than a convention.</p>
+
+      <h2>DDA and scanline</h2>
+
+      <p>Triangle filling comes out of one primitive. A DDA steps between two endpoints and
+        yields the points where a chosen coordinate crosses an integer. Run it down the
+        triangle's edges and it hands back the two endpoints of every scanline; run it
+        again along each scanline and it hands back the pixels. Two nested applications of
+        one small routine fill an arbitrary triangle.</p>
+
+      <p>What the DDA carries matters as much as where it steps. Mine interpolates the whole
+        vertex attribute vector rather than the position alone, so color, and anything else
+        attached to a vertex, is carried in the same step. Written that way, a new
+        per-vertex attribute costs the rasterizer nothing.</p>
+
+      <h2>Getting to pixels</h2>
+
+      <p>Before any filling happens, vertices have to become screen coordinates. Dividing by w
+        applies the perspective, which is what makes distant geometry smaller. The viewport
+        transform then maps normalized device coordinates onto the pixel grid. Each is a
+        few lines of arithmetic, and each is a step the GPU normally takes somewhere you
+        cannot watch it.</p>
+
+      <h2>How it gets checked</h2>
+
+      <p>The course ships reference images, and a submission is right when its output matches
+        them. That is an unforgiving way to be graded. One wrong rounding rule in the DDA
+        moves an edge by a pixel, and the comparison finds it. My output matches.</p>
+    </div>
+
+    <p class="project__stack">C++<span aria-hidden="true"> · </span>Makefile<span aria-hidden="true"> · </span>Rasterization<span aria-hidden="true"> · </span>Perspective projection</p>
+    <p class="entry__links">
+      <a href="https://cs418.cs.illinois.edu/website/mp/rasterizer.html">Course assignment spec</a>
+    </p>
+  </article>
+
+  <nav class="pager" aria-label="Other projects">
+        <a class="pager__link" href="neuron-culture-mea.html">
+          <span class="pager__dir">Newer project</span>
+          <span class="pager__title">Stem Cell Derived Neurons on an HD-MEA</span>
+        </a>
+        <a class="pager__link pager__link--older" href="eeg-fmri-reconstruction.html">
+          <span class="pager__dir">Older project</span>
+          <span class="pager__title">Cross-Modal Brain Signal Reconstruction</span>
+        </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>Champaign, Illinois</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
