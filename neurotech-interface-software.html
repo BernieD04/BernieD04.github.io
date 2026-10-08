@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EEG and EMG Neural Interface Software | Bernard Dohrn</title>
-<meta name="description" content="A year on the software side of the club, writing preprocessing and neural decoding pipelines for a full-body neural-controlled prosthetic.">
+<meta name="description" content="EMG and EEG decoding and actuator work on the Neurotech Club's neural-controlled assistive device, the project that became Second Chance Innovations.">
 
 <!-- Applied before first paint so a saved light theme never flashes dark. -->
 <script>
@@ -46,52 +46,60 @@
         <span class="project__meta-item">Neurotech Club</span>
       </p>
 
-    <p class="project__lede">A year on the software side of the club, writing preprocessing and neural decoding pipelines for a full-body neural-controlled prosthetic.</p>
+    <p class="project__lede">A year on the Neurotech Club's neural-controlled assistive device, split between the EMG and EEG decoding and the actuator.</p>
 
     <div class="prose">
-      <p>I wrote the EEG and EMG preprocessing and neural decoding pipelines, and trained PyTorch models to classify the signals. The wider project was a full-body neural-controlled prosthetic for neurodegenerative disorders, built by a team that spanned several disciplines.</p>
+      <p>Someone with limited muscle strength often still produces the electrical command for a
+        movement. The muscle fires and the signal reaches the skin; what is missing is the
+        force at the end of it. A device that reads that signal and supplies the missing force
+        is a different proposition from one driven by a button, because the intent is already
+        in the body and only has to be recovered.</p>
 
-      <p>A substantial part of my time went to validating the data pipelines and confirming that results held across recording sessions rather than only on the session they were tuned on.</p>
+      <h2>What I worked on</h2>
 
-      <!--
-        ADD DETAIL HERE.
+      <p>Two halves, at opposite ends of the same chain. On the software side I wrote the EEG and
+        EMG preprocessing and decoding pipelines and trained the PyTorch models that
+        classified the signals. On the hardware side I worked on the actuator, which is what
+        turns a decoded intent into force on the limb. The decoding answers what the person is
+        trying to do. The actuator is the part that does it.</p>
 
-        Everything below is already styled, so you can paste it in and it will
-        match the rest of the site. Delete whatever you do not use. Do not add a
-        heading with nothing under it: an empty section reads worse than no
-        section at all.
+      <p>The scope was in flux for most of the year, so what the device was meant to cover kept
+        moving. The signal problem underneath it did not move: read intent off the body
+        reliably enough that a motor can act on it, on a person who is not in a lab.</p>
 
-        <h2>Approach</h2>
-        <p>How you actually went about it.</p>
+      <h2>Why cross-session validation was most of the work</h2>
 
-        <h3>A smaller sub-point</h3>
-        <p>Text.</p>
+      <p>A substantial part of my time went to validating the pipelines across recording sessions
+        rather than within one. That is a less interesting job than training the models and it
+        matters more, because EEG and EMG recordings are not stable between sessions.
+        Electrodes go back on in slightly different places, skin impedance changes between one
+        day and the next, and the amplitude and spectrum of the signal move with them.</p>
 
-        <ul>
-          <li>A list, when the content is genuinely a list.</li>
-        </ul>
+      <p>A model trained and tested inside one session learns those session-specific properties along
+        with the thing it is supposed to classify, and scores well doing it. The same model
+        can then fail on a recording taken from the same person a week later. For an assistive
+        device that distinction is the whole question, since it has to work on the day it is
+        worn and not only on the day it was fitted. Checking that results held across sessions
+        is what separates a pipeline that works from one that looks like it works.</p>
 
-        <figure>
-          <img src="images/something.png" alt="Describe what the image shows, specifically.">
-          <figcaption>What a reader should take from it.</figcaption>
-        </figure>
+      <h2>What it became</h2>
 
-        <table>
-          <caption>What the table is comparing.</caption>
-          <thead><tr><th scope="col">Method</th><th scope="col">Result</th></tr></thead>
-          <tbody><tr><td>Name</td><td>Value</td></tr></tbody>
-        </table>
+      <p>The project continued after I left and is now a company, Second Chance Innovations, building
+        a powered upper-limb orthosis called the Rebo. It detects movement intent from EMG and
+        supplies 10 to 15 pounds of lift assistance, aimed at people living with spinal cord
+        injury and stroke. The narrowing to the upper limb, and the device settling into an
+        orthosis that assists an arm rather than replacing one, happened after my time on
+        it.</p>
 
-        <pre><code>code = "shown in mono, scrolls sideways if long"</code></pre>
-
-        <blockquote><p>A pulled-out point worth its own space.</p></blockquote>
-
-        Only put real numbers in here. If you do not have the figure to hand,
-        write the sentence without it rather than approximating.
-      -->
+      <p>I was not part of that stage and the company's progress since is not mine to claim. What I
+        can say is that the signal problem I spent the year on is the one the device still
+        rests on.</p>
     </div>
 
-    <p class="project__stack">PyTorch<span aria-hidden="true"> · </span>Signal preprocessing<span aria-hidden="true"> · </span>Neural decoding</p>
+    <p class="project__stack">PyTorch<span aria-hidden="true"> · </span>Signal preprocessing<span aria-hidden="true"> · </span>Neural decoding<span aria-hidden="true"> · </span>Actuator design</p>
+    <p class="entry__links">
+      <a href="https://secchance.com">Second Chance Innovations</a>
+    </p>
   </article>
 
   <nav class="pager" aria-label="Other projects">

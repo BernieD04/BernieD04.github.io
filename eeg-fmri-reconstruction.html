@@ -218,6 +218,20 @@
       <p>One modeling choice is a clear limitation: rest epochs were treated as zero activation, which
         is not what a resting brain does.</p>
 
+      <h2>What I would do differently</h2>
+
+      <p>The prediction target, first. Fitting a GLM per run gives clean t-statistic maps, but it
+        collapses hundreds of volumes into a single training example, and at 13 training
+        subjects that is the binding constraint on everything downstream. E2fNet's per-TR
+        targets are noisier and there are far more of them. Given the same dataset again I
+        would train against raw BOLD per TR and keep the contrast maps as an evaluation
+        target rather than a training one.</p>
+
+      <p>Two smaller ones. Rest epochs were labeled as zero activation, which is wrong as physiology
+        and avoidable by either excluding them or modeling rest explicitly. And six epochs on
+        a laptop GPU is not enough to say the transformer had converged, so the comparison
+        between the three architectures is weaker than the table makes it look.</p>
+
       <h2>References</h2>
 
       <ul>

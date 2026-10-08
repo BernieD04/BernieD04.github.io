@@ -161,6 +161,22 @@
         post-stroke reorganization differs individually. The result supports EEG carrying
         usable information about motor impairment; it does not support a clinical tool.</p>
 
+      <h2>What I would do differently</h2>
+
+      <p>The sweep was the right structure. Running five feature sets through two models answers
+        which feature types carry signal, which a single tuned model does not. What I would
+        change is its direction. Every step added features to a set already large relative to
+        21 subjects, so the experiment could only ever discover that more features hurt.
+        Starting from PSD and testing dimensionality reduction, or a fixed feature budget with
+        selection performed inside each fold, would ask the same question without spending the
+        sample size to answer it.</p>
+
+      <p>The effort task needs a different design more than a different model. 20% and 40% of maximum
+        voluntary contraction are close together, and near-chance accuracy across every
+        feature set is as consistent with the two conditions not separating at the scalp as it
+        is with a modeling failure. A wider separation would establish whether there is
+        anything there to decode.</p>
+
     </div>
 
     <p class="project__stack">scikit-learn<span aria-hidden="true"> · </span>MNE-Python<span aria-hidden="true"> · </span>Logistic regression<span aria-hidden="true"> · </span>Random forest<span aria-hidden="true"> · </span>Feature engineering</p>

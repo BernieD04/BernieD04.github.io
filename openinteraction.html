@@ -101,23 +101,54 @@
 
       <h2>The hard parts</h2>
 
-      <p>The tracking itself took the first day. The remaining work went into making the output usable:</p>
+      <p>The tracking itself took the first day. Everything after that went into the gap between a
+        script that tracks a face and something a person can point with.</p>
+
+      <h3>Jitter against latency</h3>
+
+      <p>A gaze estimate off a webcam is noisy enough that the raw position is unusable as a cursor:
+        it moves while the eye is still. Smoothing fixes that by averaging over recent
+        samples, and every sample averaged over is delay between looking somewhere and the
+        cursor arriving. Both failures sit on the same dial. Too little smoothing and the
+        cursor shakes under the target. Too much and it trails the eye far enough that the
+        user starts correcting for the lag, which compounds it. We smooth the gaze estimate
+        with KDE, but there is no setting that removes both problems, so choosing one is a
+        judgment about which failure costs that particular person more.</p>
+
+      <h3>Two event loops in one process</h3>
+
+      <p>The settings window is Tkinter and the overlays are PyQt5. Each framework runs its own event
+        loop and each expects to own the main thread, so neither can simply block while the
+        other works. The same root causes a second problem: the settings GUI writes
+        configuration while the tracking loop reads it, so the tracking loop can catch a
+        half-written config between two writes. Both are the same issue, which is that more
+        than one part of the system wants to be in charge of timing.</p>
+
+      <p>Three more, each a version of the same gap between tracking and usability:</p>
 
       <ul>
-        <li>Gaze estimates jitter, and smoothing that jitter introduces latency. Beyond a certain point, a lagging cursor is harder to use than an unsteady one.</li>
         <li>Mapping gaze coordinates onto screen space, and keeping that mapping honest as
           the head drifts away from where calibration happened.</li>
         <li>Blink detection that survives changing light without reading a slow blink as a
           click.</li>
-        <li>Running Tkinter and PyQt in one process, which means two event loops that do
-          not naturally coexist.</li>
-        <li>Race conditions when the settings GUI wrote config while the tracking loop was
-          reading it.</li>
         <li>Overlays that flickered, or moved off the screen entirely.</li>
       </ul>
 
       <p>None of these are visible in a working demo, and all of them separate a tracking script from
         something a person can actually use.</p>
+
+      <h2>What I would do differently</h2>
+
+      <p>Configurability was the right call, and it is also the part I would rebuild. Exposing
+        thresholds and bindings in a settings window assumes the person can find a good
+        setting by trying values, which is a lot to ask of someone who is using the system
+        because pointing is already hard. A guided calibration that proposes settings from a
+        short recording would do the same job without handing them a form of numeric
+        fields.</p>
+
+      <p>The two event loops would also go. Running the overlays and the settings window in one
+        framework, or splitting them into separate processes with configuration passed over a
+        queue, removes the race by construction rather than by locking around it.</p>
 
     </div>
 

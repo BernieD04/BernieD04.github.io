@@ -86,9 +86,11 @@
 
       <h2>Features, and what replaces them</h2>
 
-      <p>The current implementation extracts time-domain features from the EMG and classifies hand
-        gestures from them. That is sufficient for a system that works end to end, and it is
-        what the collection rig feeds.</p>
+      <p>The current implementation extracts time-domain features from the EMG and regresses a single
+        continuous value from them: how open or closed the fist is. The calibration endpoints
+        are what that value is measured against, which is what lets it mean the same thing
+        from one session to the next. A single scalar is a narrow version of hand pose, and it
+        is enough for a system that runs end to end.</p>
 
       <p>I am now implementing convolutive ICA for motor unit decomposition, which is a substantially
         harder problem. Each electrode sees a convolutive mixture: many motor units firing at
@@ -119,6 +121,16 @@
         sampling with every channel on a shared clock. The amplification has to remain
         low-noise enough to meet the acquisition requirements at the same time, and most of
         the current component selection is a trade-off between the two.</p>
+
+      <h2>What I would do differently</h2>
+
+      <p>The order. The collection rig and the feature pipeline came first, and the acquisition
+        hardware was picked to get those working rather than to support where the project was
+        headed. A multiplexed ADC is adequate for everything built so far and wrong for the
+        thing the project is actually for, so the board is being designed now, after the
+        software that depends on it. Checking the sampling constraint against motor unit
+        decomposition at the start would have put the front end first instead of leaving it to
+        be retrofitted under a working system.</p>
 
     </div>
 
